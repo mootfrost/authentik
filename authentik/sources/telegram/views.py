@@ -81,6 +81,10 @@ class TelegramLoginView(ChallengeStageView):
         )
 
     def challenge_valid(self, response: TelegramChallengeResponse) -> HttpResponse:
+        plan_redirect = self.executor.plan.context.get(PLAN_CONTEXT_REDIRECT)
+        if plan_redirect and plan_redirect != "authentik_core:if-user":
+            self.request.session[SESSION_KEY_GET] = {NEXT_ARG_NAME: plan_redirect}
+        
         raw_info = response.validated_data.copy()
         raw_info.pop("component")
         raw_info.pop("hash")
